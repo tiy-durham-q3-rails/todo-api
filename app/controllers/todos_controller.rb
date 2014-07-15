@@ -1,7 +1,6 @@
 class TodosController < ApplicationController
   before_action :find_todo, except: [:index, :create]
 
-  respond_to :json
 
   def index
     @todos = Todo.all
