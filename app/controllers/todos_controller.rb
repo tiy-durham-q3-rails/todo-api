@@ -5,20 +5,21 @@ class TodosController < ApplicationController
 
   def index
     @todos = Todo.all
-    render :json => @todos
+    json = Jbuilder.encode do |json|
+      json.array! @todos, :id, :title, :completed, :order
+    end
+    render :json => json
   end
 
   def show
-    todo_hash = {id: @todo.id, title: @todo.title, completed: @todo.completed, order: @todo.order}
-    render :json => todo_hash
+    render :json => todo_json(@json)
   end
 
   def create
     @todo = Todo.new(todo_params)
 
     if @todo.save
-      todo_hash = {id: @todo.id, title: @todo.title, completed: @todo.completed, order: @todo.order}
-      render :json => todo_hash, :status => :created
+      render :json => todo_json(@json), :status => :created
     else
       # return some status
     end
@@ -26,8 +27,7 @@ class TodosController < ApplicationController
 
   def update
     if @todo.update(todo_params)
-      todo_hash = {id: @todo.id, title: @todo.title, completed: @todo.completed, order: @todo.order}
-      render :json => todo_hash
+      render :json => todo_json(@json)
     else
       # return some status
     end
@@ -42,6 +42,12 @@ class TodosController < ApplicationController
   end
 
   private
+
+  def todo_json(todo)
+    Jbuilder.encode do |json|
+      json.(todo, :id, :title, :completed, :order)
+    end
+  end
 
   def todo_params
     params.require(:todo).permit(:title, :completed, :order)
